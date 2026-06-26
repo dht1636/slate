@@ -6,6 +6,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { X } from "lucide-react";
 
 interface ConfirmOptions {
   title: string;
@@ -56,12 +57,17 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
       >
         {opts && (
           <div className="confirm-body">
+            <button
+              className="confirm-close"
+              onClick={() => settle(false)}
+              autoFocus
+              aria-label="Close"
+            >
+              <X size={16} />
+            </button>
             <h3>{opts.title}</h3>
             {opts.message && <p>{opts.message}</p>}
             <div className="confirm-actions">
-              <button className="ghost-btn" onClick={() => settle(false)} autoFocus>
-                Cancel
-              </button>
               <button
                 className={opts.tone === "danger" ? "danger-btn" : "primary-btn"}
                 onClick={() => settle(true)}
