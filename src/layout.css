@@ -4,46 +4,24 @@
    ============================================================ */
 
 .app {
+  position: relative;
   display: flex;
   height: 100%;
   overflow: hidden;
+  background: var(--bg);
+}
+/* Ambient glow the floating glass refracts — keeps the editor from reading flat
+   while staying far below text contrast thresholds. */
+.app::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--ambient);
 }
 
-/* ── Left rail (sidebar + footer) ─────────────────────────── */
-.rail {
-  width: 256px;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  overflow: hidden;
-  /* impeccable-disable layout-transition -- user explicitly requested a smooth
-     sidebar collapse. width is the property that reclaims pane space; this is a
-     low-frequency toggle on a native Mac webview, not a scroll-linked hot path.
-     Inner children are fixed-width + overflow:hidden so they clip, not reflow.
-     Ease-in-out (not the UI ease-out) so the slide is actually perceptible. */
-  transition: width 260ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-.app[data-sidebar="closed"] .rail {
-  width: 0;
-  border-right-color: transparent;
-}
-.rail > .sidebar,
-.rail-foot {
-  width: 256px;
-  flex-shrink: 0;
-}
-.rail-reveal {
-  animation: reveal-in 200ms var(--ease) both;
-}
-@keyframes reveal-in {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-}
-
+/* ── Sidebar (lives inside the floating project popover) ──── */
 .sidebar {
   flex: 1;
   overflow-y: auto;
@@ -55,14 +33,6 @@
   align-items: center;
   justify-content: space-between;
   padding: var(--s-4) var(--s-3) var(--s-2) var(--s-4);
-}
-.brand {
-  font-size: var(--text-lg);
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-.brand-mark {
-  color: var(--accent);
 }
 .head-add {
   display: grid;
@@ -227,57 +197,7 @@
   white-space: nowrap;
 }
 
-/* Rail footer */
-.rail-foot {
-  display: flex;
-  align-items: center;
-  gap: var(--s-1);
-  padding: var(--s-2) var(--s-3);
-  border-top: 1px solid var(--border);
-}
-.foot-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--s-2);
-  height: 30px;
-  padding: 0 var(--s-3);
-  border-radius: var(--r-md);
-  font-size: var(--text-sm);
-  color: var(--ink-muted);
-  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
-}
-.foot-btn:hover {
-  background: var(--elevated);
-  color: var(--ink);
-}
-.foot-btn.icon {
-  margin-left: auto;
-  padding: 0;
-  width: 30px;
-  justify-content: center;
-}
-
-/* Floating reveal button when sidebar is collapsed */
-.rail-reveal {
-  position: absolute;
-  top: var(--s-3);
-  left: var(--s-3);
-  z-index: var(--z-sticky);
-  display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  border-radius: var(--r-md);
-  background: var(--elevated);
-  border: 1px solid var(--border);
-  color: var(--ink-muted);
-  box-shadow: 0 4px 12px -6px rgba(0, 0, 0, 0.4);
-}
-.rail-reveal:hover {
-  color: var(--ink);
-}
-
-/* ── Note list (middle pane) ──────────────────────────────── */
+/* ── Note list (lives inside the floating note popover) ───── */
 .notelist {
   width: 312px;
   flex-shrink: 0;
@@ -293,9 +213,6 @@
   justify-content: space-between;
   padding: var(--s-4) var(--s-3) var(--s-3) var(--s-4);
   flex-shrink: 0;
-}
-.app[data-sidebar="closed"] .notelist-head {
-  padding-left: 48px;
 }
 .nl-title {
   display: flex;
@@ -451,9 +368,11 @@ kbd.mono {
 
 /* ── Editor (right pane) ──────────────────────────────────── */
 .main {
+  position: relative;
+  z-index: 1; /* above the ambient glow on .app::before */
   flex: 1;
   min-width: 0;
-  background: var(--bg);
+  background: transparent;
   overflow: hidden;
 }
 .editor {
@@ -464,6 +383,16 @@ kbd.mono {
 }
 :root {
   --epad: clamp(var(--s-6), 5vw, 84px);
+  --editor-col: 76ch; /* the full-bleed editor centers to one comfortable column */
+}
+/* Header, toolbar, and prose share one centered column so the editor reads as a
+   single document rather than left-pinned content on a wide window. */
+.editor-head,
+.toolbar,
+.prose {
+  width: 100%;
+  max-width: var(--editor-col);
+  margin-inline: auto;
 }
 .editor-head {
   padding: var(--s-8) max(var(--epad), 56px) var(--s-3) var(--epad);
@@ -600,7 +529,7 @@ kbd.mono {
   overflow-y: auto;
 }
 .prose {
-  max-width: 70ch;
+  max-width: var(--editor-col);
   padding: var(--s-4) var(--epad) 40vh;
   font-size: var(--text-prose);
   line-height: 1.7;

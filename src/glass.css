@@ -1,0 +1,298 @@
+/* ============================================================
+   Slate — Liquid Glass floating navigation
+   The one place glass is intentional: a global nav that floats over
+   the editor, refracting the content (and the ambient glow) beneath it.
+   Tokens live in styles.css.
+   ============================================================ */
+
+/* ── The glass material ───────────────────────────────────── */
+.glass {
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  border: 1px solid var(--glass-edge);
+  box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-sheen),
+    inset 0 -1px 1px oklch(0 0 0 / 0.12);
+}
+/* Diagonal specular gloss — the "liquid" sheen sliding off the top edge. */
+.glass {
+  position: relative;
+  isolation: isolate;
+}
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: -1;
+  background: linear-gradient(
+    135deg,
+    var(--glass-sheen) 0%,
+    transparent 38%,
+    transparent 100%
+  );
+  opacity: 0.5;
+}
+
+/* Graceful fallback where backdrop-filter is unsupported. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background: var(--glass-strong);
+  }
+}
+
+/* ── The bar ──────────────────────────────────────────────── */
+.floatbar {
+  position: fixed;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  z-index: var(--z-floatbar);
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+  max-width: calc(100vw - 32px);
+  padding: 7px;
+  border-radius: 20px;
+  animation: floatbar-in 420ms var(--ease) both;
+}
+@keyframes floatbar-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 22px);
+  }
+}
+
+.fb-brand {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin-left: 4px;
+  font-size: var(--text-base);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.fb-dot {
+  color: var(--accent);
+  font-size: 0.5em;
+  vertical-align: super;
+  margin-left: 1px;
+}
+
+.fb-div {
+  width: 1px;
+  height: 22px;
+  background: var(--glass-edge);
+  margin: 0 2px;
+  flex-shrink: 0;
+}
+
+.fb-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Pills — the project + note navigators */
+.fb-pill {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  height: 38px;
+  padding: 0 var(--s-3);
+  border-radius: 13px;
+  color: var(--ink);
+  max-width: 200px;
+  transition: background var(--dur-fast) var(--ease),
+    box-shadow var(--dur-fast) var(--ease);
+}
+.fb-pill svg {
+  flex-shrink: 0;
+  color: var(--ink-muted);
+  transition: color var(--dur-fast) var(--ease);
+}
+.fb-pill:hover {
+  background: var(--glass-hover);
+}
+.fb-pill:hover svg {
+  color: var(--ink);
+}
+.fb-pill[data-open] {
+  background: var(--glass-hover);
+  box-shadow: inset 0 0 0 1px var(--glass-edge);
+}
+.fb-pill[data-open] svg {
+  color: var(--accent);
+}
+.fb-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+.fb-note .fb-label {
+  max-width: 168px;
+}
+.fb-count {
+  flex-shrink: 0;
+  color: var(--ink-faint);
+  padding: 2px 5px;
+  border-radius: var(--r-sm);
+  background: var(--glass-hover);
+}
+
+.fb-notegroup {
+  gap: 0;
+}
+.fb-step {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 38px;
+  border-radius: 11px;
+  color: var(--ink-faint);
+  transition: background var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+.fb-step:hover:not(:disabled) {
+  background: var(--glass-hover);
+  color: var(--ink);
+}
+.fb-step:disabled {
+  opacity: 0.32;
+  cursor: default;
+}
+
+.fb-new {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 13px;
+  background: var(--accent);
+  color: var(--accent-fill-ink);
+  box-shadow: var(--accent-glow);
+  transition: background var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease);
+}
+.fb-new:hover:not(:disabled) {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+.fb-new:active:not(:disabled) {
+  transform: translateY(0);
+}
+.fb-new:disabled {
+  opacity: 0.4;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.fb-primary-pill {
+  color: var(--accent);
+}
+.fb-primary-pill svg {
+  color: var(--accent);
+}
+
+.fb-icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 38px;
+  margin-right: 2px;
+  border-radius: 12px;
+  color: var(--ink-muted);
+  transition: background var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+.fb-icon:hover {
+  background: var(--glass-hover);
+  color: var(--ink);
+}
+
+/* ── Popovers (project tree / note list) ──────────────────── */
+.pop {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  z-index: var(--z-pop);
+  display: flex;
+  flex-direction: column;
+  width: 340px;
+  max-width: calc(100vw - 28px);
+  max-height: min(64vh, 560px);
+  overflow: hidden;
+  border-radius: 16px;
+  transform-origin: bottom;
+  animation: pop-in 200ms var(--ease) both;
+  /* the stronger fill keeps list text comfortably readable through the blur */
+  background: var(--glass-strong);
+}
+.pop[data-anchor="left"] {
+  left: -7px;
+}
+.pop[data-anchor="right"] {
+  right: -7px;
+}
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+}
+
+/* Reuse Sidebar / NoteList inside the glass popover — strip their old
+   fixed-pane chrome so the glass frame is the only surface. */
+.pop .sidebar,
+.pop .notelist {
+  width: auto;
+  min-height: 0;
+  flex: 1;
+  background: transparent;
+  border: none;
+  overflow: hidden;
+}
+.pop .proj-list,
+.pop .nl-items {
+  overflow-y: auto;
+}
+.pop .side-head,
+.pop .notelist-head {
+  padding: var(--s-3) var(--s-3) var(--s-2) var(--s-4);
+}
+.side-title {
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+/* hover surfaces inside the popover read against glass, not opaque --elevated */
+.pop .proj-row:hover:not([data-active]),
+.pop .coll-row:hover:not([data-active]),
+.pop .nl-item:hover {
+  background: var(--glass-hover);
+}
+
+/* Invisible catcher: clicking the editor (anything but the bar/popover)
+   closes the menu. Sits below the bar so the bar stays interactive. */
+.pop-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-scrim);
+  cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floatbar,
+  .pop {
+    animation: none;
+  }
+  .fb-new:hover:not(:disabled) {
+    transform: none;
+  }
+}

@@ -94,16 +94,19 @@ Standard, consistent vocabulary across the app (earned familiarity beats inventi
 
 - Every interactive control ships all states: default, hover, focus (visible ring using `--accent` or `--border-strong`), active, disabled, loading, selected.
 - **Buttons:** primary = amber fill + `--accent-fill-ink`; secondary = surface + hairline border; ghost = transparent → `--elevated` on hover.
-- **Three-pane app shell:** project rail/sidebar (`--surface`) → note list (`--surface`) → editor (`--bg`). Sidebar collapsible.
-- **Command palette** (⌘K) is a first-class navigation/action affordance — fits the keyboard-first principle.
+- **Editor-first shell + floating glass nav.** v2 hands the whole window to the editor (centered to a single `--editor-col` column) and replaces the persistent sidebars with one **floating Liquid Glass bar** pinned bottom-center — the global "project → project, note → note" control. It carries the brand mark, a project navigator and a note navigator (each opening its list in an upward glass popover that reuses `Sidebar`/`NoteList` verbatim), prev/next note steppers with a live `idx/total` counter, the primary new-note action, and the theme toggle. Shortcuts: ⌘⇧P projects, ⌘K notes, Escape closes. See **Navigation material** below.
 - Empty states teach (how to create a project/note, key shortcut), never blank "nothing here".
 - Loading uses skeletons, not center spinners. Native macOS scrollbars — don't reinvent.
 - Modals are a last resort; prefer inline + popover. Rename, move, and create flow inline where possible.
 
+## Navigation material — Liquid Glass
+
+The floating nav is the one place glass is intentional, not decorative (it floats *over* the editor and must read as a distinct layer that refracts the content beneath it — the textbook justified use). Tokens are theme-aware and live in `styles.css` (`--glass`, `--glass-strong` for reading-heavy popovers, `--glass-edge`, `--glass-sheen`, `--glass-hover`, `--glass-blur`, `--glass-shadow`, `--accent-glow`). Recipe: translucent fill + `backdrop-filter: blur() saturate(180%)`, a hairline `--glass-edge`, an inset top `--glass-sheen` rim, a layered drop `--glass-shadow`, and a soft diagonal gloss via `::before`. A `@supports not (backdrop-filter)` fallback swaps to the opaque `--glass-strong`. A barely-there `--ambient` glow on `.app::before` gives the glass something to pick up; it stays far below text-contrast thresholds. Amber stays the single accent — the new-note button (with `--accent-glow`) and active navigators only.
+
 ## Z-index scale
 
-`--z-dropdown: 100`, `--z-sticky: 200`, `--z-modal-backdrop: 300`, `--z-modal: 400`, `--z-toast: 500`, `--z-tooltip: 600`. No arbitrary 9999.
+`--z-dropdown: 100`, `--z-sticky: 200`, `--z-scrim: 240`, `--z-floatbar: 250`, `--z-pop: 260`, `--z-modal-backdrop: 300`, `--z-modal: 400`, `--z-toast: 500`, `--z-tooltip: 600`. No arbitrary 9999. (The popover scrim sits *below* the bar so the bar stays interactive; delete-confirm modals still layer above the popovers.)
 
 ## Bans (enforced)
 
-Generic-AI/SaaS look, gradient text, decorative glassmorphism, cream/sand body bg, side-stripe borders, hero-metric template, identical card grids, per-section uppercase eyebrows, numbered section markers. Corporate-sterile gray is equally out.
+Generic-AI/SaaS look, gradient text, cream/sand body bg, side-stripe borders, hero-metric template, identical card grids, per-section uppercase eyebrows, numbered section markers. Corporate-sterile gray is equally out. **Glassmorphism is permitted in exactly one place — the floating navigation material above — and nowhere else** (no glass cards, glass modals, or glass-for-flavor).

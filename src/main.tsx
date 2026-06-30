@@ -8,6 +8,7 @@ import { StoreProvider } from "./store";
 import { ConfirmProvider } from "./confirm";
 import "./styles.css";
 import "./layout.css";
+import "./glass.css";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>

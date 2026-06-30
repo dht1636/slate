@@ -57,7 +57,13 @@ function RenameInput({
   );
 }
 
-function ProjectNode({ project }: { project: Project }) {
+function ProjectNode({
+  project,
+  onNavigate,
+}: {
+  project: Project;
+  onNavigate?: () => void;
+}) {
   const {
     collections,
     notes,
@@ -126,7 +132,10 @@ function ProjectNode({ project }: { project: Project }) {
         ) : (
           <button
             className="proj-name"
-            onClick={() => select({ kind: "project", projectId: project.id })}
+            onClick={() => {
+              select({ kind: "project", projectId: project.id });
+              onNavigate?.();
+            }}
             onDoubleClick={() => setEditingId(project.id)}
             title="Double-click to rename"
           >
@@ -178,13 +187,14 @@ function ProjectNode({ project }: { project: Project }) {
                   ) : (
                     <button
                       className="coll-name"
-                      onClick={() =>
+                      onClick={() => {
                         select({
                           kind: "collection",
                           projectId: project.id,
                           collectionId: c.id,
-                        })
-                      }
+                        });
+                        onNavigate?.();
+                      }}
                       onDoubleClick={() => setEditingId(c.id)}
                       title="Double-click to rename"
                     >
@@ -211,15 +221,13 @@ function ProjectNode({ project }: { project: Project }) {
   );
 }
 
-export function Sidebar() {
+export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const { projects, createProject } = useStore();
 
   return (
     <nav className="sidebar" aria-label="Projects">
       <div className="side-head">
-        <span className="brand">
-          <span className="brand-mark">S</span>late
-        </span>
+        <span className="side-title mono">Projects</span>
         <button
           className="head-add"
           onClick={createProject}
@@ -231,7 +239,7 @@ export function Sidebar() {
       </div>
       <ul className="proj-list">
         {projects.map((p) => (
-          <ProjectNode key={p.id} project={p} />
+          <ProjectNode key={p.id} project={p} onNavigate={onNavigate} />
         ))}
       </ul>
     </nav>

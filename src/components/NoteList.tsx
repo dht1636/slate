@@ -5,7 +5,7 @@ import { useConfirm } from "../confirm";
 import { formatWhen, snippet } from "../lib/format";
 import type { Note } from "../types";
 
-export function NoteList() {
+export function NoteList({ onNavigate }: { onNavigate?: () => void } = {}) {
   const {
     notes,
     projects,
@@ -106,7 +106,9 @@ export function NoteList() {
         </div>
         <button
           className="head-add"
-          onClick={() => createNote()}
+          onClick={() => {
+            if (createNote()) onNavigate?.();
+          }}
           title="New note  ⌘N"
           aria-label="New note"
         >
@@ -118,7 +120,12 @@ export function NoteList() {
         <div className="nl-empty">
           <FileText size={20} strokeWidth={1.5} />
           <p>No notes yet</p>
-          <button className="ghost-btn" onClick={() => createNote()}>
+          <button
+            className="ghost-btn"
+            onClick={() => {
+              if (createNote()) onNavigate?.();
+            }}
+          >
             Create one
           </button>
           <kbd className="mono">⌘N</kbd>
@@ -135,7 +142,10 @@ export function NoteList() {
                 className="nl-item"
                 data-id={n.id}
                 data-active={n.id === activeNoteId || undefined}
-                onClick={() => openNote(n.id)}
+                onClick={() => {
+                  openNote(n.id);
+                  onNavigate?.();
+                }}
               >
                 <span className="nl-item-title">{n.title || "Untitled"}</span>
                 <span className="nl-item-snip">
